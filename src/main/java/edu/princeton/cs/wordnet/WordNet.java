@@ -4,20 +4,49 @@
  *  Description:
  **************************************************************************** */
 
+import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.Bag;
+import edu.princeton.cs.algs4.Digraph;
+import edu.princeton.cs.algs4.Topological;
 
 public class WordNet {
 
     String nullArgMessage = "arguments can not be null";
+    Digraph hypernymsDigraph;
 
     // constructor takes the name of two input files
-    WordNet(String synsets, String hypernims) {
+    WordNet(String synsets, String hypernyms) {
 
-        if (synsets == null || hypernims == null) {
+        if (synsets == null || hypernyms == null) {
             throw new IllegalArgumentException(nullArgMessage);
         }
 
-        System.out.println(synsets + " " + hypernims);
+        buildHypernymsDigraphFromInputFile(new In(hypernyms));
+        checkHypernymsDigraphIsRootedDAG();
+    }
+
+    private void buildHypernymsDigraphFromInputFile(In inputStream) {
+
+        String[] lines = inputStream.readAllLines();
+        this.hypernymsDigraph = new Digraph(lines.length);
+
+        for (String line : lines) {
+            String[] parts = line.split(",");
+            int v = Integer.parseInt(parts[0]);
+
+            for (int i = 1; i < parts.length; i++) {
+                int w = Integer.parseInt(parts[i]);
+                this.hypernymsDigraph.addEdge(v, w);
+            }
+        }
+    }
+
+    private void checkHypernymsDigraphIsRootedDAG() {
+        Topological tryTopologicallySortHypernyms = new Topological(hypernymsDigraph);
+
+        if (!tryTopologicallySortHypernyms.hasOrder()) {
+            throw new IllegalArgumentException("input hypernyms digraph is not a rooted DAG");
+        }
     }
 
     // returns all WordNet nouns

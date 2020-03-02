@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 public class WordnetTests {
-    WordNet wordnet0 = new WordNet("synsets100-subgraph.txt", "hypenyms100-subgraph");
+    WordNet wordnet0 = new WordNet("wordnet/synsets100-subgraph.txt", "wordnet/hypernyms100-subgraph.txt");
 
     @Test
     void testIllegalNullArguments() {
@@ -19,14 +19,14 @@ public class WordnetTests {
 
         assertAll("constructor",
                 () -> assertThrows(IllegalArgumentException.class, 
-                                   () -> new WordNet(null, "hypernyms.txt")),
+                                   () -> new WordNet(null, "wordnet/hypernyms.txt")),
                 () -> assertThrows(IllegalArgumentException.class, 
-                                   () -> new WordNet("synsets.txt", null)),
+                                   () -> new WordNet("wordnet/synsets.txt", null)),
                 () -> assertThrows(IllegalArgumentException.class,
                                    () -> new WordNet(null, null)));
 
 
-        WordNet testObj = new WordNet("synsets.txt", "hypernyms.txt");
+        WordNet testObj = new WordNet("wordnet/synsets.txt", "wordnet/hypernyms.txt");
 
         assertAll("instance methods",
                 () -> assertThrows(IllegalArgumentException.class,
@@ -49,6 +49,8 @@ public class WordnetTests {
 
     @Test
     void testIllegalConstructorArgumentNonRootedDAG() {
+        assertThrows(IllegalArgumentException.class, 
+                     () -> new WordNet("wordnet/synsets.txt", "wordnet/cyclicDigraph.txt"));
     }
 
     @Test
