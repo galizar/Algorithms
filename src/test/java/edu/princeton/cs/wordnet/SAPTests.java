@@ -103,8 +103,9 @@ public class SAPTests {
                   () -> assertEquals(6, testSAP1.length(13, 6), "5"),
                   () -> assertEquals(10, testSAP1.length(21, 23), "6"),
                   () -> assertEquals(2, testSAP1.length(21, 1), "7"),
-                  () -> assertEquals(-1, testSAP1.length(0, 1), "8"),
-                  () -> assertEquals(1, testSAP1.length(1, 1), "9"));
+                  () -> assertEquals(2, testSAP1.length(1, 21), "8"),
+                  () -> assertEquals(-1, testSAP1.length(0, 1), "9"),
+                  () -> assertEquals(0, testSAP1.length(1, 1), "10"));
 
         assertAll("ancestor method on ints",
                   () -> assertEquals(-1, testSAP1.ancestor(0, 0), "1"),
@@ -114,8 +115,9 @@ public class SAPTests {
                   () -> assertEquals(0, testSAP1.ancestor(13, 6), "5"),
                   () -> assertEquals(0, testSAP1.ancestor(21, 23), "6"),
                   () -> assertEquals(0, testSAP1.ancestor(21, 1), "7"),
-                  () -> assertEquals(-1, testSAP1.ancestor(0, 1), "8"),
-                  () -> assertEquals(0, testSAP1.ancestor(1, 1), "9"));
+                  () -> assertEquals(0, testSAP1.ancestor(1, 21), "8"),
+                  () -> assertEquals(-1, testSAP1.ancestor(0, 1), "9"),
+                  () -> assertEquals(0, testSAP1.ancestor(1, 1), "10"));
     }
 
     @Test
@@ -150,7 +152,7 @@ public class SAPTests {
         assertAll("length method on iterables",
                   () -> assertEquals(3, testSAP1.length(v1, w1)), // shortest = 15 <-> 22 
                   () -> assertEquals(-1, testSAP1.length(v2, w2)),
-                  () -> assertEquals(1, testSAP1.length(v3, w3))); // shortest possible path: two equal vertices
+                  () -> assertEquals(0, testSAP1.length(v3, w3))); // shortest possible path: two equal vertices
 
         assertAll("ancestor method on iterables",
                   () -> assertEquals(9, testSAP1.ancestor(v1, w1)),

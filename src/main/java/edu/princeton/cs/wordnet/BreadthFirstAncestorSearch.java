@@ -20,7 +20,7 @@ class BreadthFirstAncestorSearch {
         if (!anyIsARoot(v, w)) {
 
             if (v == w) {
-                ancestorPathLength = 1;
+                ancestorPathLength = 0;
                 commonAncestorVertix = G.adj(v).iterator().next();
             } else {
                 BreadthFirstDirectedPaths pathsFromV = new BreadthFirstDirectedPaths(G, v);
@@ -43,7 +43,7 @@ class BreadthFirstAncestorSearch {
                 if (anyIsARoot(vv, ww)) return;
 
                 if (vv == ww) {
-                    ancestorPathLength = 1;
+                    ancestorPathLength = 0;
                     commonAncestorVertix = G.adj(vv).iterator().next();
                     return; // found a shortest possible path, so stop
                 } else {
@@ -53,7 +53,7 @@ class BreadthFirstAncestorSearch {
                     ancestorBFS(pathsFromV, vv, ww);
 
                     // reverse to previous values if not found a shorter path
-                    if (prevAncestorPathLength != -1 && !(ancestorPathLength < prevAncestorPathLength)) {
+                    if (prevAncestorPathLength != -1 && ancestorPathLength >= prevAncestorPathLength) {
                         ancestorPathLength = prevAncestorPathLength;
                         commonAncestorVertix = prevCommonAncestorVertix;
                     }
@@ -95,7 +95,7 @@ class BreadthFirstAncestorSearch {
                     distToSource[w] = distToSource[v] + 1;
                     isMarked[w] = true;
 
-                    if (pathsFromOther.hasPathTo(w)) {
+                    if (other != w && pathsFromOther.hasPathTo(w)) {
                         commonAncestorVertix = w;
 
                         if (isSourceDescendantOfOther) {

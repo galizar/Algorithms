@@ -1,9 +1,3 @@
-/* *****************************************************************************
- *  Name:
- *  Date:
- *  Description:
- **************************************************************************** */
-
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.ST;
 import edu.princeton.cs.algs4.Bag;
@@ -12,13 +6,14 @@ import edu.princeton.cs.algs4.Topological;
 
 public class WordNet {
 
-    final String nullArgMessage = "arguments can not be null";
-    Digraph hypernymsDigraph;
-    String[] synsets;
-    ST<String, Integer> nouns = new ST<>();
+    private final String nullArgMessage = "arguments can not be null";
+    private Digraph hypernymsDigraph;
+    private String[] synsets;
+    private ST<String, Integer> nouns = new ST<>(); // maps a noun to the index of the synset it is contained in
+    private SAP ancestralRelations;
 
     // constructor takes the name of two input files
-    WordNet(String synsets, String hypernyms) {
+    public WordNet(String synsets, String hypernyms) {
 
         if (synsets == null || hypernyms == null) {
             throw new IllegalArgumentException(nullArgMessage);
@@ -43,6 +38,8 @@ public class WordNet {
                 this.hypernymsDigraph.addEdge(v, w);
             }
         }
+
+        this.ancestralRelations = new SAP(hypernymsDigraph);
     }
 
     private void checkHypernymsDigraphIsRootedDAG() {
@@ -85,7 +82,10 @@ public class WordNet {
 
         checkInputNouns(nounA, nounB);
 
-        return 0;
+        int nounASynsetIdx = nouns.get(nounA);
+        int nounBSynsetIdx = nouns.get(nounB);
+
+        return ancestralRelations.length(nounASynsetIdx, nounBSynsetIdx);
     }
 
     private void checkInputNouns(String nounA, String nounB) {
@@ -101,11 +101,13 @@ public class WordNet {
     public String sap(String nounA, String nounB) {
 
         checkInputNouns(nounA, nounB);
-        
-        return "stub";
+
+        int nounASynsetIdx = nouns.get(nounA);
+        int nounBSynsetIdx = nouns.get(nounB);
+        int ancestorSynsetIdx = ancestralRelations.ancestor(nounASynsetIdx, nounBSynsetIdx);
+
+        return ancestorSynsetIdx != -1 ? synsets[ancestorSynsetIdx] : "";
     }
 
-    public static void main(String[] args) {
-
-    }
+    public static void main(String[] args) {}
 }
