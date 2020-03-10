@@ -92,7 +92,7 @@ public class WordNet {
         if (nounA == null || nounB == null) {
             throw new IllegalArgumentException(nullArgMessage);
         } else if (!nouns.contains(nounA) || !nouns.contains(nounB)) {
-            throw new IllegalArgumentException("input nouns must be a WordNet noun");
+            throw new IllegalArgumentException("input nouns must be WordNet nouns");
         }
     }
 

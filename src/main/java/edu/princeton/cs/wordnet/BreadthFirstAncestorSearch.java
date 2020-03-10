@@ -17,64 +17,43 @@ class BreadthFirstAncestorSearch {
         isMarked = new boolean[G.V()];
         distToSource = new int[G.V()];
 
-        if (!anyIsARoot(v, w)) {
-
-            if (v == w) {
-                ancestorPathLength = 0;
-                commonAncestorVertix = G.adj(v).iterator().next();
-            } else {
-                BreadthFirstDirectedPaths pathsFromV = new BreadthFirstDirectedPaths(G, v);
-                ancestorBFS(pathsFromV, v, w);
-            }
-
+        if (v == w) {
+            ancestorPathLength = 0;
+            commonAncestorVertix = v;
+        } else {
+            BreadthFirstDirectedPaths pathsFromV = new BreadthFirstDirectedPaths(G, v);
+            ancestorBFS(pathsFromV, v, w);
         }
+
     }
 
     BreadthFirstAncestorSearch(Digraph G, Iterable<Integer> v, Iterable<Integer> w) {
 
         this.G = G;
-        isMarked = new boolean[G.V()];
-        distToSource = new int[G.V()];
-
         BreadthFirstDirectedPaths pathsFromV = new BreadthFirstDirectedPaths(G, v);
 
         for (int vv : v) {
             for (int ww : w) {
-                if (anyIsARoot(vv, ww)) return;
+                isMarked = new boolean[G.V()];
+                distToSource = new int[G.V()];
 
                 if (vv == ww) {
                     ancestorPathLength = 0;
-                    commonAncestorVertix = G.adj(vv).iterator().next();
+                    commonAncestorVertix = vv; 
                     return; // found a shortest possible path, so stop
                 } else {
-                    int prevAncestorPathLength = ancestorPathLength;
-                    int prevCommonAncestorVertix = commonAncestorVertix;
-
                     ancestorBFS(pathsFromV, vv, ww);
-
-                    // reverse to previous values if not found a shorter path
-                    if (prevAncestorPathLength != -1 && ancestorPathLength >= prevAncestorPathLength) {
-                        ancestorPathLength = prevAncestorPathLength;
-                        commonAncestorVertix = prevCommonAncestorVertix;
-                    }
                 }
             }
         }
     }
 
-    private boolean anyIsARoot(int... vertices) {
-        
-        for (int v : vertices) {
-            if (!G.adj(v).iterator().hasNext()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     void ancestorBFS(BreadthFirstDirectedPaths pathsFromOther, int other, int s) {
-        boolean isSourceAncestorOfOther = pathsFromOther.hasPathTo(s);
-        boolean isSourceDescendantOfOther = false;
+
+        if (pathsFromOther.hasPathTo(s)) {
+            // source is ancestor of other
+            setAncestorAndLength(s, pathsFromOther.distTo(s));
+        }
 
         Queue<Integer> q = new Queue<>();
         isMarked[s] = true;
@@ -85,31 +64,29 @@ class BreadthFirstAncestorSearch {
             int v = q.dequeue();
 
             for (int w : G.adj(v)) {
-                if (!isSourceDescendantOfOther && other == w) {
-                    isSourceDescendantOfOther = true;
-                }
-                
-                if (!isMarked[w]) {
+
+                if (other == w) {
+                    // source is descendant of other
+                    setAncestorAndLength(other, distToSource[v] + 1);
+                } else if (!isMarked[w]) {
 
                     q.enqueue(w);
                     distToSource[w] = distToSource[v] + 1;
                     isMarked[w] = true;
 
-                    if (other != w && pathsFromOther.hasPathTo(w)) {
-                        commonAncestorVertix = w;
-
-                        if (isSourceDescendantOfOther) {
-                            ancestorPathLength = pathsFromOther.distTo(w) + 1;
-                        } else if (isSourceAncestorOfOther) {
-                            ancestorPathLength = distToSource[w] + 1;
-                        } else {
-                            ancestorPathLength = pathsFromOther.distTo(w) + distToSource[w];
-                        }
-
-                        return;
+                    if (pathsFromOther.hasPathTo(w)) {
+                        setAncestorAndLength(w, pathsFromOther.distTo(w) + distToSource[w]);
                     }
                 }
             }
+        }
+    }
+
+    private void setAncestorAndLength(int newAncestor, int newLength) {
+
+        if (ancestorPathLength == -1 || newLength < ancestorPathLength) {
+            commonAncestorVertix = newAncestor;
+            ancestorPathLength = newLength;
         }
     }
 }

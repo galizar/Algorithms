@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 public class WordnetTests {
     WordNet testWordNet100 = new WordNet("wordnet/synsets100-subgraph.txt", "wordnet/hypernyms100-subgraph.txt");
     WordNet testWordNet15 = new WordNet("wordnet/synsets15.txt", "wordnet/hypernyms15Tree.txt");
+    WordNet testFullWordNet = new WordNet("wordnet/synsets.txt", "wordnet/hypernyms.txt");
 
     @Test
     void testIllegalNullArguments() {
@@ -31,8 +32,7 @@ public class WordnetTests {
                 () -> assertThrows(IllegalArgumentException.class,
                                    () -> testWordNet100.isNoun(null)),
 
-                () -> assertThrows(IllegalArgumentException.class,
-                                   () -> testWordNet100.distance(null, "Abel")),
+                () -> assertThrows(IllegalArgumentException.class, () -> testWordNet100.distance(null, "Abel")),
                 () -> assertThrows(IllegalArgumentException.class,
                                    () -> testWordNet100.distance("Abel", null)),
                 () -> assertThrows(IllegalArgumentException.class,
@@ -102,36 +102,36 @@ public class WordnetTests {
 
         assertAll("with one-noun synsets",
                   () -> assertEquals(4, testWordNet15.distance("c", "j"), "1"),
-                  () -> assertEquals(2, testWordNet15.distance("k", "l"), "2"),
-                  () -> assertEquals(-1, testWordNet15.distance("a", "m"), "3"),
-                  () -> assertEquals(2, testWordNet15.distance("g", "k"), "4"));
+                  () -> assertEquals(1, testWordNet15.distance("k", "l"), "2"),
+                  () -> assertEquals(4, testWordNet15.distance("a", "m"), "3"),
+                  () -> assertEquals(1, testWordNet15.distance("g", "k"), "4"));
 
         assertAll("with several-noun synsets",
                   () -> assertEquals(6, testWordNet100.distance("aminotransferase", "lactalbumin"), "5"),
                   () -> assertEquals(5, testWordNet100.distance("transferrin", "chymosin"), "6"),
                   () -> assertEquals(3, testWordNet100.distance("CRP", "gamma_globulin"), "7"),
-                  () -> assertEquals(-1, testWordNet100.distance("entity", "jimhickey"), "8"),
+                  () -> assertEquals(2, testWordNet100.distance("entity", "jimhickey"), "8"),
                   () -> assertEquals(11, testWordNet100.distance("aminotransferase", "jimdandy"), "9"),
-                  () -> assertEquals(2, testWordNet100.distance("ricin", "lactalbumin")),
-                  () -> assertEquals(-1, testWordNet100.distance("ricin", "entity")),
-                  () -> assertEquals(-1, testWordNet100.distance("lactalbumin", "entity")));
+                  () -> assertEquals(2, testWordNet100.distance("ricin", "lactalbumin"), "10"),
+                  () -> assertEquals(9, testWordNet100.distance("ricin", "entity"), "11"),
+                  () -> assertEquals(9, testWordNet100.distance("lactalbumin", "entity"), "12"),
+                  () -> assertEquals(13, testFullWordNet.distance("block", "venae_centrales_hepatis")));
     }
 
     @Test
     void testSAP() {
-        // damn sap is a bad name for this method, but we can't change it tho
 
         assertAll("with one-noun synsets",
                   () -> assertEquals("a", testWordNet15.sap("c", "j"), "1"),
-                  () -> assertEquals("f", testWordNet15.sap("k", "l"), "2"),
-                  () -> assertEquals("", testWordNet15.sap("a", "m"), "3"),
-                  () -> assertEquals("f", testWordNet15.sap("g", "k"), "4"));
+                  () -> assertEquals("k", testWordNet15.sap("k", "l"), "2"),
+                  () -> assertEquals("a", testWordNet15.sap("a", "m"), "3"),
+                  () -> assertEquals("k", testWordNet15.sap("g", "k"), "4"));
 
         assertAll("with several-noun synsets",
                   () -> assertEquals("protein", testWordNet100.sap("aminotransferase", "lactalbumin"), "1"),
                   () -> assertEquals("protein", testWordNet100.sap("transferrin", "chymosin"), "2"),
                   () -> assertEquals("globulin", testWordNet100.sap("CRP", "gamma_globulin"), "3"),
-                  () -> assertEquals("", testWordNet100.sap("entity", "jimhickey"), "4"),
+                  () -> assertEquals("entity", testWordNet100.sap("entity", "jimhickey"), "4"),
                   () -> assertEquals("entity", testWordNet100.sap("aminotransferase", "jimdandy"), "5"),
                   () -> assertEquals("albumin albumen", testWordNet100.sap("ricin", "serum_albumin")));
     }

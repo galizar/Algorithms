@@ -18,7 +18,7 @@ public class OutcastTests {
 
         assertAll("outcast tests",
                   () -> assertEquals("jimdandy", testOutcast.outcast(testNouns1)),
-                  () -> assertEquals("ricin", testOutcast.outcast(testNouns2)),
+                  () -> assertEquals("entity", testOutcast.outcast(testNouns2)),
                   () -> assertEquals("fibrinase", testOutcast.outcast(testNouns3)));
     }
 }
