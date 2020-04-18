@@ -121,29 +121,33 @@ public class SeamCarver {
             }
 
             if (isTransposed) transpose();
-            removeHorizontalSeamPixel(x, y, newPixels, newEnergy);
+            removeSeamPixel(x, y, newPixels, newEnergy);
         }
 
         pixels = newPixels;
         energy = newEnergy;
     }
 
-    private void removeHorizontalSeamPixel(int x, int y, int[][] newPixels, double[][] newEnergy) {
+    private void removeSeamPixel(int x, int y, int[][] newPixels, double[][] newEnergy) {
 
-        if (y == 0) {
-            System.arraycopy(pixels[x], 1, newPixels[x], 0, height() - 1);
-            System.arraycopy(energy[x], 1, newEnergy[x], 0, height() - 1);
-        } else if (y == height() - 1) {
-            System.arraycopy(pixels[x], 0, newPixels[x], 0, height() - 1);
-            System.arraycopy(energy[x], 0, newEnergy[x], 0, height() - 1);
+        int length = !isTransposed ? height() : width();
+        int i = !isTransposed ? x : y;
+        int j = !isTransposed ? y : x;
+
+        if (j == 0) {
+            System.arraycopy(pixels[i], 1, newPixels[i], 0, length - 1);
+            System.arraycopy(energy[i], 1, newEnergy[i], 0, length - 1);
+        } else if (j == length - 1) {
+            System.arraycopy(pixels[i], 0, newPixels[i], 0, length - 1);
+            System.arraycopy(energy[i], 0, newEnergy[i], 0, length - 1);
         } else {
-            // top half
-            System.arraycopy(pixels[x], 0, newPixels[x], 0, y);
-            System.arraycopy(energy[x], 0, newEnergy[x], 0, y);
+            // 1st half, top if !transposed, left if transposed
+            System.arraycopy(pixels[i], 0, newPixels[i], 0, j);
+            System.arraycopy(energy[i], 0, newEnergy[i], 0, j);
 
-            // bottom half
-            System.arraycopy(pixels[x], y + 1, newPixels[x], y, height() - 1 - y);
-            System.arraycopy(energy[x], y + 1, newEnergy[x], y, height() - 1 - y);
+            // 2nd half, bottom if !transp., right if transp.
+            System.arraycopy(pixels[i], j + 1, newPixels[i], j, length - 1 - j);
+            System.arraycopy(energy[i], j + 1, newEnergy[i], j, length - 1 - j);
         }
     }
 
@@ -168,30 +172,11 @@ public class SeamCarver {
 
             // transpose (if needed) so that the nested arrays (in the pixels array) are the rows
             if (!isTransposed) transpose();
-            removeVerticalSeamPixel(x, y, newPixels, newEnergy);
+            removeSeamPixel(x, y, newPixels, newEnergy);
         }
 
         pixels = newPixels;
         energy = newEnergy;
-    }
-
-    private void removeVerticalSeamPixel(int x, int y, int[][] newPixels, double[][] newEnergy) {
-
-        if (x == 0) {
-            System.arraycopy(pixels[y], 1, newPixels[y], 0, width() - 1);
-            System.arraycopy(energy[y], 1, newEnergy[y], 0, width() - 1);
-        } else if (x == width() - 1) {
-            System.arraycopy(pixels[y], 0, newPixels[y], 0, width() - 1);
-            System.arraycopy(energy[y], 0, newEnergy[y], 0, width() - 1);
-        } else {
-            // top half
-            System.arraycopy(pixels[y], 0, newPixels[y], 0, x);
-            System.arraycopy(energy[y], 0, newEnergy[y], 0, x);
-
-            // bottom half
-            System.arraycopy(pixels[y], x + 1, newPixels[y], x, width() - 1 - x);
-            System.arraycopy(energy[y], x + 1, newEnergy[y], x, width() - 1 - x);
-        }
     }
 
     private boolean seamHasGap(int[] seam, int idx) {
