@@ -10,6 +10,7 @@ public class SeamCarverTests {
     Picture twelveByTenPic = new Picture("seam/12x10.png");
     Picture threeByFourPic = new Picture("seam/3x4.png");
     Picture sixByFivePic = new Picture("seam/6x5.png");
+    Picture fiveBySixPic = new Picture("seam/5x6.png");
     SeamCarver seam12By10 = new SeamCarver(twelveByTenPic);
     SeamCarver seam3By4 = new SeamCarver(threeByFourPic);
 
@@ -160,11 +161,14 @@ public class SeamCarverTests {
     }
 
     @Test
-    public void testRemoveHorizontalSeam() {
+    public void testRemoveHorizontalSeamEvenWidthOddHeight() {
 
         int[] seam = new int[] {2, 2, 1, 2, 1, 1};
         SeamCarver carver = new SeamCarver(sixByFivePic);
+
+        assertEquals(5, carver.height(), "before removal picture should have height of 5");
         carver.removeHorizontalSeam(seam);
+        assertEquals(4, carver.height(), "after removal picture should have height of 4");
 
         Picture afterPicture = new Picture(6, 4);
 
@@ -187,10 +191,10 @@ public class SeamCarverTests {
         // 3rd
         afterPicture.setRGB(0, 2, sixByFivePic.getRGB(0,3));
         afterPicture.setRGB(1, 2, sixByFivePic.getRGB(1,3));
-        afterPicture.setRGB(2, 2, sixByFivePic.getRGB(2,2));
+        afterPicture.setRGB(2, 2, sixByFivePic.getRGB(2,3));
         afterPicture.setRGB(3, 2, sixByFivePic.getRGB(3,3));
-        afterPicture.setRGB(4, 2, sixByFivePic.getRGB(4,2));
-        afterPicture.setRGB(5, 2, sixByFivePic.getRGB(5,2));
+        afterPicture.setRGB(4, 2, sixByFivePic.getRGB(4,3));
+        afterPicture.setRGB(5, 2, sixByFivePic.getRGB(5,3));
 
         // 4th
         afterPicture.setRGB(0, 3, sixByFivePic.getRGB(0,4));
@@ -204,8 +208,154 @@ public class SeamCarverTests {
     }
 
     @Test
-    public void testRemoveVerticalSeamMethod() {
+    public void testRemoveHorizontalSeamOddWidthEvenHeight() {
 
+        int[] seam = new int[] {0, 1, 2, 3, 4};
+        SeamCarver carver = new SeamCarver(fiveBySixPic);
+
+        assertEquals(6, carver.height(), "before removal picture should have height of 6");
+        carver.removeHorizontalSeam(seam);
+        assertEquals(5, carver.height(), "after removal picture should have height of 5");
+
+        Picture afterPicture = new Picture(5, 5);
+
+        // 1st row
+        afterPicture.setRGB(0, 0, fiveBySixPic.getRGB(0,1));
+        afterPicture.setRGB(1, 0, fiveBySixPic.getRGB(1,0));
+        afterPicture.setRGB(2, 0, fiveBySixPic.getRGB(2,0));
+        afterPicture.setRGB(3, 0, fiveBySixPic.getRGB(3,0));
+        afterPicture.setRGB(4, 0, fiveBySixPic.getRGB(4,0));
+
+        // 2nd
+        afterPicture.setRGB(0, 1, fiveBySixPic.getRGB(0,2));
+        afterPicture.setRGB(1, 1, fiveBySixPic.getRGB(1,2));
+        afterPicture.setRGB(2, 1, fiveBySixPic.getRGB(2,1));
+        afterPicture.setRGB(3, 1, fiveBySixPic.getRGB(3,1));
+        afterPicture.setRGB(4, 1, fiveBySixPic.getRGB(4,1));
+
+        // 3rd
+        afterPicture.setRGB(0, 2, fiveBySixPic.getRGB(0,3));
+        afterPicture.setRGB(1, 2, fiveBySixPic.getRGB(1, 3));
+        afterPicture.setRGB(2, 2, fiveBySixPic.getRGB(2,3));
+        afterPicture.setRGB(3, 2, fiveBySixPic.getRGB(3,2));
+        afterPicture.setRGB(4, 2, fiveBySixPic.getRGB(4,2));
+
+        // 4th
+        afterPicture.setRGB(0, 3, fiveBySixPic.getRGB(0,4));
+        afterPicture.setRGB(1, 3, fiveBySixPic.getRGB(1, 4));
+        afterPicture.setRGB(2, 3, fiveBySixPic.getRGB(2,4));
+        afterPicture.setRGB(3, 3, fiveBySixPic.getRGB(3,4));
+        afterPicture.setRGB(4, 3, fiveBySixPic.getRGB(4,3));
+
+        // 5th
+        afterPicture.setRGB(0, 4, fiveBySixPic.getRGB(0,5));
+        afterPicture.setRGB(1, 4, fiveBySixPic.getRGB(1, 5));
+        afterPicture.setRGB(2, 4, fiveBySixPic.getRGB(2,5));
+        afterPicture.setRGB(3, 4, fiveBySixPic.getRGB(3,5));
+        afterPicture.setRGB(4, 4, fiveBySixPic.getRGB(4,5));
+
+        assertEquals(afterPicture, carver.picture());
+    }
+
+    @Test
+    public void testRemoveVerticalSeamMethodEvenWidthOddHeight() {
+
+        int[] seam = new int[] {3, 2, 1, 2, 3};
+        SeamCarver carver = new SeamCarver(sixByFivePic);
+
+        assertEquals(6, carver.width(), "picture width must be 6 before removal");
+        carver.removeVerticalSeam(seam);
+        assertEquals(5, carver.width(), "picture width must be 5 after removal");
+
+        Picture afterPicture = new Picture(5, 5);
+
+        // 1st row
+        afterPicture.setRGB(0, 0, fiveBySixPic.getRGB(0,0));
+        afterPicture.setRGB(1, 0, fiveBySixPic.getRGB(1,0));
+        afterPicture.setRGB(2, 0, fiveBySixPic.getRGB(2,0));
+        afterPicture.setRGB(3, 0, fiveBySixPic.getRGB(4,0));
+        afterPicture.setRGB(4, 0, fiveBySixPic.getRGB(5,0));
+
+        // 2nd
+        afterPicture.setRGB(0, 1, fiveBySixPic.getRGB(0,1));
+        afterPicture.setRGB(1, 1, fiveBySixPic.getRGB(1,1));
+        afterPicture.setRGB(2, 1, fiveBySixPic.getRGB(3,1));
+        afterPicture.setRGB(3, 1, fiveBySixPic.getRGB(4,1));
+        afterPicture.setRGB(4, 1, fiveBySixPic.getRGB(5,1));
+
+        // 3rd
+        afterPicture.setRGB(0, 2, fiveBySixPic.getRGB(0,2));
+        afterPicture.setRGB(1, 2, fiveBySixPic.getRGB(2, 2));
+        afterPicture.setRGB(2, 2, fiveBySixPic.getRGB(3,2));
+        afterPicture.setRGB(3, 2, fiveBySixPic.getRGB(4,2));
+        afterPicture.setRGB(4, 2, fiveBySixPic.getRGB(5,2));
+
+        // 4th
+        afterPicture.setRGB(0, 3, fiveBySixPic.getRGB(0,3));
+        afterPicture.setRGB(1, 3, fiveBySixPic.getRGB(1, 3));
+        afterPicture.setRGB(2, 3, fiveBySixPic.getRGB(3,3));
+        afterPicture.setRGB(3, 3, fiveBySixPic.getRGB(4,3));
+        afterPicture.setRGB(4, 3, fiveBySixPic.getRGB(5,3));
+
+        // 5th
+        afterPicture.setRGB(0, 4, fiveBySixPic.getRGB(0,4));
+        afterPicture.setRGB(1, 4, fiveBySixPic.getRGB(1, 4));
+        afterPicture.setRGB(2, 4, fiveBySixPic.getRGB(2,4));
+        afterPicture.setRGB(3, 4, fiveBySixPic.getRGB(4,4));
+        afterPicture.setRGB(4, 4, fiveBySixPic.getRGB(5,4));
+
+        assertEquals(afterPicture, carver.picture());
+    }
+
+    @Test
+    public void testRemoveVerticalSeamOddWidthEvenHeight() {
+
+        int[] seam = new int[] {3, 2, 1, 2, 3, 3};
+        SeamCarver carver = new SeamCarver(fiveBySixPic);
+
+        assertEquals(5, carver.width(), "picture width must be 5 before removal");
+        carver.removeVerticalSeam(seam);
+        assertEquals(4, carver.width(), "picture width must be 4 after removal");
+
+        Picture afterPicture = new Picture(4, 6);
+
+        // 1st row
+        afterPicture.setRGB(0, 0, fiveBySixPic.getRGB(0,0));
+        afterPicture.setRGB(1, 0, fiveBySixPic.getRGB(1,0));
+        afterPicture.setRGB(2, 0, fiveBySixPic.getRGB(2,0));
+        afterPicture.setRGB(3, 0, fiveBySixPic.getRGB(4,0));
+
+        // 2nd
+        afterPicture.setRGB(0, 1, fiveBySixPic.getRGB(0,1));
+        afterPicture.setRGB(1, 1, fiveBySixPic.getRGB(1,1));
+        afterPicture.setRGB(2, 1, fiveBySixPic.getRGB(3,1));
+        afterPicture.setRGB(3, 1, fiveBySixPic.getRGB(4,1));
+
+        // 3rd
+        afterPicture.setRGB(0, 2, fiveBySixPic.getRGB(0,2));
+        afterPicture.setRGB(1, 2, fiveBySixPic.getRGB(2,2));
+        afterPicture.setRGB(2, 2, fiveBySixPic.getRGB(3,2));
+        afterPicture.setRGB(3, 2, fiveBySixPic.getRGB(4,2));
+
+        // 4th
+        afterPicture.setRGB(0, 3, fiveBySixPic.getRGB(0,3));
+        afterPicture.setRGB(1, 3, fiveBySixPic.getRGB(1,3));
+        afterPicture.setRGB(2, 3, fiveBySixPic.getRGB(3,3));
+        afterPicture.setRGB(3, 3, fiveBySixPic.getRGB(4,3));
+
+        // 5th
+        afterPicture.setRGB(0, 4, fiveBySixPic.getRGB(0,4));
+        afterPicture.setRGB(1, 4, fiveBySixPic.getRGB(1,4));
+        afterPicture.setRGB(2, 4, fiveBySixPic.getRGB(2,4));
+        afterPicture.setRGB(3, 4, fiveBySixPic.getRGB(4,4));
+
+        // 6th
+        afterPicture.setRGB(0, 5, fiveBySixPic.getRGB(0,5));
+        afterPicture.setRGB(1, 5, fiveBySixPic.getRGB(1,5));
+        afterPicture.setRGB(2, 5, fiveBySixPic.getRGB(2,5));
+        afterPicture.setRGB(3, 5, fiveBySixPic.getRGB(4,5));
+        
+        assertEquals(afterPicture, carver.picture());
     }
 
     public static void main(String[] args) {
