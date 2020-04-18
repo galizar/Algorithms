@@ -116,6 +116,8 @@ public class SeamCarver {
             int y = seam[x];
             if (!isPixelInRange(x, y)) {
                 throw new IllegalArgumentException("entry (" + x + "," + y + ") is out of range");
+            } else if (seamHasGap(seam, x)) {
+                throw new IllegalArgumentException("seam gap on idx " + x);
             }
 
             if (isTransposed) transpose();
@@ -152,14 +154,16 @@ public class SeamCarver {
         else if (seam.length != height()) throw new IllegalArgumentException("seam of incorrect length");
         else if (width() <= 1) throw new IllegalArgumentException("picture too narrow to remove seam");
 
-        int[][] newPixels = new int[width() - 1][height()];
-        double[][] newEnergy = new double[width() - 1][height()];
+        int[][] newPixels = new int[height()][width() - 1];
+        double[][] newEnergy = new double[height()][width() - 1];
 
-        for (int y = 0; y < width(); y++) {
+        for (int y = 0; y < height(); y++) {
 
             int x = seam[y];
             if (!isPixelInRange(x, y)) {
                 throw new IllegalArgumentException("entry (" + x + "," + y + ") is out of range");
+            } else if (seamHasGap(seam, y)) {
+                throw new IllegalArgumentException("seam gap on idx: " + y);
             }
 
             // transpose (if needed) so that the nested arrays (in the pixels array) are the rows
@@ -190,16 +194,27 @@ public class SeamCarver {
         }
     }
 
+    private boolean seamHasGap(int[] seam, int idx) {
+
+        if (idx == seam.length - 1) return false;
+
+        return Math.abs(seam[idx] - seam[idx + 1]) > 1;
+    }
+
     private void transpose() {
 
-        int[][] transposed = new int[pixels[0].length][pixels.length];
+        int[][] transposedPixels = new int[pixels[0].length][pixels.length];
+        double[][] transposedEnergy = new double[pixels[0].length][pixels.length];
 
         for (int i = 0; i < pixels[0].length; i++) {
-            for (int j = 0; j < pixels.length; j++)
-                transposed[i][j] = pixels[j][i];
+            for (int j = 0; j < pixels.length; j++) {
+                transposedPixels[i][j] = pixels[j][i];
+                transposedEnergy[i][j] = energy[j][i];
+            }
         }
 
-        pixels = transposed;
+        pixels = transposedPixels;
+        energy = transposedEnergy;
         isTransposed = !isTransposed;
     }
 

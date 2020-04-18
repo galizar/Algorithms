@@ -270,39 +270,39 @@ public class SeamCarverTests {
         Picture afterPicture = new Picture(5, 5);
 
         // 1st row
-        afterPicture.setRGB(0, 0, fiveBySixPic.getRGB(0,0));
-        afterPicture.setRGB(1, 0, fiveBySixPic.getRGB(1,0));
-        afterPicture.setRGB(2, 0, fiveBySixPic.getRGB(2,0));
-        afterPicture.setRGB(3, 0, fiveBySixPic.getRGB(4,0));
-        afterPicture.setRGB(4, 0, fiveBySixPic.getRGB(5,0));
+        afterPicture.setRGB(0, 0, sixByFivePic.getRGB(0,0));
+        afterPicture.setRGB(1, 0, sixByFivePic.getRGB(1,0));
+        afterPicture.setRGB(2, 0, sixByFivePic.getRGB(2,0));
+        afterPicture.setRGB(3, 0, sixByFivePic.getRGB(4,0));
+        afterPicture.setRGB(4, 0, sixByFivePic.getRGB(5,0));
 
         // 2nd
-        afterPicture.setRGB(0, 1, fiveBySixPic.getRGB(0,1));
-        afterPicture.setRGB(1, 1, fiveBySixPic.getRGB(1,1));
-        afterPicture.setRGB(2, 1, fiveBySixPic.getRGB(3,1));
-        afterPicture.setRGB(3, 1, fiveBySixPic.getRGB(4,1));
-        afterPicture.setRGB(4, 1, fiveBySixPic.getRGB(5,1));
+        afterPicture.setRGB(0, 1, sixByFivePic.getRGB(0,1));
+        afterPicture.setRGB(1, 1, sixByFivePic.getRGB(1,1));
+        afterPicture.setRGB(2, 1, sixByFivePic.getRGB(3,1));
+        afterPicture.setRGB(3, 1, sixByFivePic.getRGB(4,1));
+        afterPicture.setRGB(4, 1, sixByFivePic.getRGB(5,1));
 
         // 3rd
-        afterPicture.setRGB(0, 2, fiveBySixPic.getRGB(0,2));
-        afterPicture.setRGB(1, 2, fiveBySixPic.getRGB(2, 2));
-        afterPicture.setRGB(2, 2, fiveBySixPic.getRGB(3,2));
-        afterPicture.setRGB(3, 2, fiveBySixPic.getRGB(4,2));
-        afterPicture.setRGB(4, 2, fiveBySixPic.getRGB(5,2));
+        afterPicture.setRGB(0, 2, sixByFivePic.getRGB(0,2));
+        afterPicture.setRGB(1, 2, sixByFivePic.getRGB(2, 2));
+        afterPicture.setRGB(2, 2, sixByFivePic.getRGB(3,2));
+        afterPicture.setRGB(3, 2, sixByFivePic.getRGB(4,2));
+        afterPicture.setRGB(4, 2, sixByFivePic.getRGB(5,2));
 
         // 4th
-        afterPicture.setRGB(0, 3, fiveBySixPic.getRGB(0,3));
-        afterPicture.setRGB(1, 3, fiveBySixPic.getRGB(1, 3));
-        afterPicture.setRGB(2, 3, fiveBySixPic.getRGB(3,3));
-        afterPicture.setRGB(3, 3, fiveBySixPic.getRGB(4,3));
-        afterPicture.setRGB(4, 3, fiveBySixPic.getRGB(5,3));
+        afterPicture.setRGB(0, 3, sixByFivePic.getRGB(0,3));
+        afterPicture.setRGB(1, 3, sixByFivePic.getRGB(1, 3));
+        afterPicture.setRGB(2, 3, sixByFivePic.getRGB(3,3));
+        afterPicture.setRGB(3, 3, sixByFivePic.getRGB(4,3));
+        afterPicture.setRGB(4, 3, sixByFivePic.getRGB(5,3));
 
         // 5th
-        afterPicture.setRGB(0, 4, fiveBySixPic.getRGB(0,4));
-        afterPicture.setRGB(1, 4, fiveBySixPic.getRGB(1, 4));
-        afterPicture.setRGB(2, 4, fiveBySixPic.getRGB(2,4));
-        afterPicture.setRGB(3, 4, fiveBySixPic.getRGB(4,4));
-        afterPicture.setRGB(4, 4, fiveBySixPic.getRGB(5,4));
+        afterPicture.setRGB(0, 4, sixByFivePic.getRGB(0,4));
+        afterPicture.setRGB(1, 4, sixByFivePic.getRGB(1, 4));
+        afterPicture.setRGB(2, 4, sixByFivePic.getRGB(2,4));
+        afterPicture.setRGB(3, 4, sixByFivePic.getRGB(4,4));
+        afterPicture.setRGB(4, 4, sixByFivePic.getRGB(5,4));
 
         assertEquals(afterPicture, carver.picture());
     }
