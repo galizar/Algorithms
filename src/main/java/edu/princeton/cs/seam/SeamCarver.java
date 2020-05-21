@@ -31,8 +31,11 @@ public class SeamCarver {
             for (int y = 0; y < H; y++)
                 pixels[x][y] = picture.getRGB(x, y);
         }
-
-        updateEnergies(this.energy, this.pixels);
+        
+        for (int x = 0; x < W; x++) {
+            for (int y = 0; y < H; y++)
+                energy[x][y] = calcEnergy(x, y, pixels);
+        }
     }
 
     // current picture
@@ -285,6 +288,8 @@ public class SeamCarver {
 
     private void updateEnergies(double[][] energy, int[][] pixels) {
 
+        // this is the only thing left to make more efficient. only should calculate energy
+        // of the pixels along the just-removed pixels
         for (int i = 0; i < W(); i++) {
             for (int j = 0; j < H(); j++) {
                 energy[i][j] = calcEnergy(i, j, pixels);
