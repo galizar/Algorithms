@@ -1,6 +1,12 @@
+import edu.princeton.cs.algs4.IndexMinPQ;
 import edu.princeton.cs.algs4.Picture;
+import edu.princeton.cs.algs4.Stack;
 
 import java.awt.Color;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 public class SeamCarver {
 
@@ -22,11 +28,11 @@ public class SeamCarver {
         this.pixels = new int[W][H];
 
         for (int x = 0;  x < W; x++) {
-            for (int y = 0; y < H; y++) {
+            for (int y = 0; y < H; y++)
                 pixels[x][y] = picture.getRGB(x, y);
-                energy[x][y] = calcEnergy(x, y, picture);
-            }
         }
+
+        updateEnergies(this.energy, this.pixels);
     }
 
     // current picture
@@ -45,40 +51,37 @@ public class SeamCarver {
         return currentPic;
     }
 
-    // width of current picture
     public int width() {
         return !isTransposed ? pixels.length : pixels[0].length;
     }
 
-    // height of current picture
     public int height() {
         return !isTransposed ? pixels[0].length : pixels.length;
     }
 
-    // energy of pixel at column x and row y
     public double energy(int x, int y) {
 
         if (!isPixelInRange(x, y)) throw new IllegalArgumentException("pixel is out of range");
 
-        return energy[x][y];
+        return !isTransposed ? energy[x][y] : energy[y][x];
     }
 
-    private double calcEnergy(int x, int y, Picture picture) {
+    private double calcEnergy(int x, int y, int[][] pixels) {
 
-        if (x == 0 || x == width() - 1 || y == 0 || y == height() - 1) return 1000.0;
+        if (x == 0 || x == W() - 1 || y == 0 || y == H() - 1) return 1000.0;
 
-        Color left = picture.get(x - 1, y);
-        Color right = picture.get(x + 1, y);
-        Color up = picture.get(x, y - 1);
-        Color down = picture.get(x, y + 1);
+        int left = pixels[x - 1][y];
+        int right = pixels[x + 1][y];
+        int up = pixels[x][y - 1];
+        int down = pixels[x][y + 1];
 
-        double redXGradient = Math.abs(left.getRed() - right.getRed());
-        double greenXGradient = Math.abs(left.getGreen() - right.getGreen());
-        double blueXGradient = Math.abs(left.getBlue() - right.getBlue());
+        double redXGradient = Math.abs(red(left) - red(right));
+        double greenXGradient = Math.abs(green(left) - green(right));
+        double blueXGradient = Math.abs(blue(left) - blue(right));
 
-        double redYGradient = Math.abs(up.getRed() - down.getRed());
-        double greenYGradient = Math.abs(up.getGreen() - down.getGreen());
-        double blueYGradient = Math.abs(up.getBlue() - down.getBlue());
+        double redYGradient = Math.abs(red(up) - red(down));
+        double greenYGradient = Math.abs(green(up) - green(down));
+        double blueYGradient = Math.abs(blue(up) - blue(down));
 
         double xGradientSq = Math.pow(redXGradient, 2) +
                 Math.pow(greenXGradient, 2) +
@@ -91,14 +94,145 @@ public class SeamCarver {
         return Math.sqrt(xGradientSq + yGradientSq);
     }
 
+    // red component of a BufferedImage rgb int
+    private int red(int rgb) {
+        return (rgb >> 16) & 0x000000FF;
+    }
+
+    // green component of a BufferedImage rgb int
+    private int green(int rgb) {
+        return (rgb >> 8) & 0x000000FF;
+    }
+
+    // blue component of a BufferedImage rgb int
+    private int blue(int rgb) {
+        return (rgb) & 0x000000FF;
+    }
+
     // sequence of indices for horizontal seam
     public int[] findHorizontalSeam() {
-        return new int[0];
+
+        if (!isTransposed) transpose();
+        return findSeam();
     }
 
     // sequence of indices for vertical seam
     public int[] findVerticalSeam() {
-        return new int[0];
+
+        if (isTransposed) transpose();
+        return findSeam();
+    }
+
+    private int[] findSeam() {
+
+        double[] energyTo = new double[width() * height()];
+        int[] pixelTo = new int[width() * height()];
+        IndexMinPQ<Double> pq = new IndexMinPQ<>(width() * height());
+
+
+        // skip two top pixels each time.
+        // traverse just enough sources so as to reach every relevant non-source pixel
+        // doing this also helps to know which top pixel will be used for the seam
+
+        for (int i = 2; i < W(); i += 3) {
+            energyTo[i] = 0;
+            pixelTo[i] = i;
+            pq.insert(pixelIdx(i, 0), energy[i][0]);
+        }
+
+        for (int i = W(); i < width() * height(); i++)
+            energyTo[i] = Double.POSITIVE_INFINITY;
+
+        while (!pq.isEmpty()) {
+
+            int pixelIdx = pq.delMin();
+
+            for (int adjPixelIdx : adjPixels(pixelIdx)) {
+                relax(pixelIdx, adjPixelIdx, energyTo, pixelTo, pq);
+            }
+        }
+
+        int[] seam = new int[H()];
+        buildSeam(energyTo, pixelTo, seam);
+        return seam;
+    }
+
+    private int W() {
+        return !isTransposed ? width() : height();
+    }
+
+    private int H() {
+        return !isTransposed ? height() : width();
+    }
+
+    private void relax(int fromIdx,
+                       int toIdx,
+                       double[] energyTo,
+                       int[] pixelTo,
+                       IndexMinPQ<Double> pq) {
+
+        int[] toPixelPos = pixelPos(toIdx);
+        int iToPixel = toPixelPos[0];
+        int jToPixel = toPixelPos[1];
+
+        if (energyTo[toIdx] > energyTo[fromIdx] + energy[iToPixel][jToPixel]) {
+
+            energyTo[toIdx] = energyTo[fromIdx] + energy[iToPixel][jToPixel];
+            pixelTo[toIdx] = fromIdx;
+
+            if (pq.contains(toIdx)) pq.decreaseKey(toIdx, energyTo[toIdx]);
+            else                    pq.insert(toIdx, energyTo[toIdx]);
+        }
+    }
+
+    // works only for images where W >= 3
+    private void buildSeam(double[] energyTo, int[] pixelTo, int[] seam) {
+
+        int nextSeamPixel = H() * W() - W(); // initial: first pixel of last row
+        double leastEnergy = energyTo[nextSeamPixel];
+
+        // find first the last pixel of the seam (a pixel on bottom row of least energy to source)
+        // notice the jump over two pixels on each iteration. just need to go through enough
+        // pixels so as to cover the whole SPT
+        for (int idx = nextSeamPixel + 3; idx < W() * H(); idx += 3) {
+            if (energyTo[idx] < leastEnergy) {
+                nextSeamPixel = idx;
+                leastEnergy = energyTo[idx];
+            }
+        }
+
+        int nextPosToAdd;
+
+        for (int i = seam.length - 1; i >= 0; i--) {
+            nextPosToAdd = pixelPos(nextSeamPixel)[0];
+            seam[i] = nextPosToAdd;
+            nextSeamPixel = pixelTo[nextSeamPixel];
+        }
+    }
+
+    private int[] adjPixels(int idx) {
+
+        int[] adj;
+
+        if (idx > W() * H() - W() - 1) {
+            // pixel is on last row
+            adj = new int[0];
+            return adj;
+        }
+        else if (idx % W() == 0) { // idx pixel is in first column
+            adj = new int[] {idx + W(),
+                             idx + W() + 1};
+
+        } else if ((idx + 1) % W() == 0) { // idx pixel is in last column
+            adj = new int[] {idx + W() - 1,
+                             idx + W()};
+
+        } else {
+            adj = new int[] {idx + W() - 1,
+                             idx + W(),
+                             idx + W() + 1};
+        }
+        return adj;
     }
 
     // remove horizontal seam from current picture
@@ -121,14 +255,16 @@ public class SeamCarver {
             }
 
             if (isTransposed) transpose();
-            removeSeamPixel(x, y, newPixels, newEnergy);
+            removeSeamPixel(x, y, newPixels);
         }
 
         pixels = newPixels;
+
+        updateEnergies(newEnergy, pixels);
         energy = newEnergy;
     }
 
-    private void removeSeamPixel(int x, int y, int[][] newPixels, double[][] newEnergy) {
+    private void removeSeamPixel(int x, int y, int[][] newPixels) {
 
         int length = !isTransposed ? height() : width();
         int i = !isTransposed ? x : y;
@@ -136,18 +272,23 @@ public class SeamCarver {
 
         if (j == 0) {
             System.arraycopy(pixels[i], 1, newPixels[i], 0, length - 1);
-            System.arraycopy(energy[i], 1, newEnergy[i], 0, length - 1);
         } else if (j == length - 1) {
             System.arraycopy(pixels[i], 0, newPixels[i], 0, length - 1);
-            System.arraycopy(energy[i], 0, newEnergy[i], 0, length - 1);
         } else {
             // 1st half, top if !transposed, left if transposed
             System.arraycopy(pixels[i], 0, newPixels[i], 0, j);
-            System.arraycopy(energy[i], 0, newEnergy[i], 0, j);
 
             // 2nd half, bottom if !transp., right if transp.
             System.arraycopy(pixels[i], j + 1, newPixels[i], j, length - 1 - j);
-            System.arraycopy(energy[i], j + 1, newEnergy[i], j, length - 1 - j);
+        }
+    }
+
+    private void updateEnergies(double[][] energy, int[][] pixels) {
+
+        for (int i = 0; i < W(); i++) {
+            for (int j = 0; j < H(); j++) {
+                energy[i][j] = calcEnergy(i, j, pixels);
+            }
         }
     }
 
@@ -172,10 +313,12 @@ public class SeamCarver {
 
             // transpose (if needed) so that the nested arrays (in the pixels array) are the rows
             if (!isTransposed) transpose();
-            removeSeamPixel(x, y, newPixels, newEnergy);
+            removeSeamPixel(x, y, newPixels);
         }
 
         pixels = newPixels;
+
+        updateEnergies(newEnergy, pixels);
         energy = newEnergy;
     }
 
@@ -205,6 +348,18 @@ public class SeamCarver {
 
     private boolean isPixelInRange(int x, int y) {
         return (x >= 0 && x < width() && y >= 0 && y < height());
+    }
+
+    private int pixelIdx(int i, int j) {
+        return (j + 1) * W() - (W() - i);
+    }
+
+    private int[] pixelPos(int pixelIdx) {
+
+        int j = Math.floorDiv(pixelIdx, W());
+        int i = pixelIdx - (j * W());
+
+        return new int[] {i, j};
     }
 
     public static void main(String[] args) {

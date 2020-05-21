@@ -1,9 +1,14 @@
 import edu.princeton.cs.algs4.Picture;
 
 import org.junit.jupiter.api.Test;
+
+import java.awt.Color;
+import java.util.Arrays;
+
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SeamCarverTests {
 
@@ -66,12 +71,7 @@ public class SeamCarverTests {
     @Test
     public void testIllegalSeamEntryOutsideRange() {
 
-        // ith index of seam array indicates pos of pixel along direction of the seam
-        // i.e. x pos for horizontal, y pos for vertical
-        // value of seam array at ith idx indicates orthogonal pos to direction of seam
-        // i.e. y pos for horizontal, x pos for vertical
-
-        int[] verticalSeam1 = new int[] {12, 0, 1, 2, 3, 4, 5, 6, 7, 8};
+        int[] verticalSeam1 = new int[] {12, 1, 2, 3, 4, 5, 6, 7, 8, 9};
         int[] verticalSeam2 = new int[] {0, 1, 2, 3, 4, 12, 5, 6, 7, 8};
         int[] verticalSeam3 = new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 12};
 
@@ -258,6 +258,41 @@ public class SeamCarverTests {
     }
 
     @Test
+    public void testCorrectEnergyAfterHorizontalSeamRemoval() {
+        int[] seam = new int[] {2, 2, 1, 2, 1, 1};
+        SeamCarver carver = new SeamCarver(sixByFivePic);
+        carver.removeHorizontalSeam(seam);
+
+        assertEquals(1000.0, carver.energy(0, 0), 0);
+        assertEquals(1000.0, carver.energy(1, 0), 0);
+        assertEquals(1000.0, carver.energy(2, 0), 0);
+        assertEquals(1000.0, carver.energy(3, 0), 0);
+        assertEquals(1000.0, carver.energy(4, 0), 0);
+        assertEquals(1000.0, carver.energy(5, 0), 0);
+
+        assertEquals(1000.0, carver.energy(0, 1), 0);
+        assertEquals(161.31, carver.energy(1, 1), 0.01);
+        assertEquals(125.23, carver.energy(2, 1), 0.01);
+        assertEquals(167.81, carver.energy(3, 1), 0.01);
+        assertEquals(135.5, carver.energy(4, 1), 0.01);
+        assertEquals(1000.0, carver.energy(5, 1), 0);
+
+        assertEquals(1000.0, carver.energy(0, 2), 0);
+        assertEquals(253.42, carver.energy(1, 2), 0.01);
+        assertEquals(174.00, carver.energy(2, 2), 0.01);
+        assertEquals(227.48, carver.energy(3, 2), 0.01);
+        assertEquals(194.5, carver.energy(4, 2), 0.01);
+        assertEquals(1000.0, carver.energy(5, 2), 0);
+
+        assertEquals(1000.0, carver.energy(0, 3), 0);
+        assertEquals(1000.0, carver.energy(1, 3), 0);
+        assertEquals(1000.0, carver.energy(2, 3), 0);
+        assertEquals(1000.0, carver.energy(3, 3), 0);
+        assertEquals(1000.0, carver.energy(4, 3), 0);
+        assertEquals(1000.0, carver.energy(5, 3), 0);
+    }
+
+    @Test
     public void testRemoveVerticalSeamMethodEvenWidthOddHeight() {
 
         int[] seam = new int[] {3, 2, 1, 2, 3};
@@ -358,7 +393,25 @@ public class SeamCarverTests {
         assertEquals(afterPicture, carver.picture());
     }
 
-    public static void main(String[] args) {
+    @Test
+    public void testFindHorizontalSeam() {
 
+        SeamCarver carver = new SeamCarver(sixByFivePic);
+        int[] seam = carver.findHorizontalSeam();
+
+        int[] expectedSeam = new int[] {2, 2, 1, 2, 1, 0};
+
+        assertTrue(Arrays.equals(expectedSeam, seam));
+    }
+
+    @Test
+    public void testFindVerticalSeam() {
+
+        SeamCarver carver = new SeamCarver(sixByFivePic);
+        int[] seam = carver.findVerticalSeam();
+
+        int[] expectedSeam = new int[] {5, 4, 3, 2, 3};
+
+        assertTrue(Arrays.equals(expectedSeam, seam));
     }
 }
